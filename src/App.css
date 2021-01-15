@@ -17,16 +17,20 @@ body {
 
 .player {}
 
-.decisions {
-  display: flex;
-  margin: 0 auto;
-  justify-content: space-around;
-  width: 75%;
+.decisions {  
+  margin: 0 auto; 
+  width: 60%;
   position: absolute;
   bottom: 20%;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2147483647;
+}
+
+.decisions_container {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 5% 0;
 }
 
 .decision {
@@ -55,12 +59,8 @@ body {
 }
 
 .base_progress_bar {
-  border: 2px solid lightgray;
-  position: absolute;
-  bottom: 12%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 45%;
+  border: 2px solid lightgray; 
+  width: 100%;
   z-index: 2147483647;
   -webkit-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
   -moz-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);

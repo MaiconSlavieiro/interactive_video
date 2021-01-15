@@ -1,10 +1,10 @@
 import './App.css';
 import "./video-react.css";
-import { Player, BigPlayButton  } from 'video-react';
+import { Player, BigPlayButton } from 'video-react';
 import React, { useEffect, useState } from 'react';
 import { useWindowSize } from '@react-hook/window-size';
 
-function App() {   
+function App() {
 
   const playerIns = React.createRef();
 
@@ -16,10 +16,12 @@ function App() {
   const [interection, setInterection] = useState("");
   const [changes, setChanges] = useState({});
   const [progressBarPor, setProgressBarPor] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(false);
+
 
   const [width, height] = useWindowSize()
 
-  let progressBar = {width: progressBarPor + "%"}
+  let progressBar = { width: progressBarPor + "%" }
 
   let script = {
     start: {
@@ -112,16 +114,16 @@ function App() {
 
   }
 
-  const loadVideo = (id) => {     
+  const loadVideo = (id) => {
     let sequence = script[id];
     setShowInteraction(false);
-    setCurrentVideo(sequence);  
-    
-    if(sequence.videoUrl != currentVideo.videoUrl)
-    setVideoLink(sequence.videoUrl); 
+    setCurrentVideo(sequence);
+
+    if (sequence.videoUrl != currentVideo.videoUrl)
+      setVideoLink(sequence.videoUrl);
   }
 
-  function loadDefaultNextVideo(sequence) {    
+  function loadDefaultNextVideo(sequence) {
     let next_video;
     let next_config;
     if (sequence.decisions) {
@@ -133,37 +135,38 @@ function App() {
     } else {
       next_video = undefined;
     }
-    
+
     setNextVideo(next_video);
     console.log('loadDefaultNextVideo try set', next_video, 'nextVideo', nextVideo)
   }
 
   const initPlayer = () => {
-    loadVideo("start")
+    loadVideo("start");
   }
 
   const startInteraction = () => {
-    if(!showInteraction && !disableIntercation) {  
+    if (!showInteraction && !disableIntercation) {
       setShowInteraction(true)
     }
   }
 
   const endInteraction = () => {
-    if(showInteraction) {  
+    if (showInteraction) {
       setShowInteraction(false)
     }
-    if(disableIntercation) {
+    if (disableIntercation) {
       setDisableIntercation(false)
     }
   }
 
   const endVideo = () => {
-    if(nextVideo) {
-      loadVideo(nextVideo);      
-    }     
+    if (nextVideo) {
+      setAutoPlay(true);
+      loadVideo(nextVideo);
+    }
   }
 
-  useEffect(() => {    
+  useEffect(() => {
 
     let current_time = changes.currentTime;
     let round_current_time = Math.round(changes.currentTime);
@@ -171,13 +174,13 @@ function App() {
     let interaction_end = currentVideo.interactionEnd;
 
     let interaction_time = interaction_end - interaction_start;
-    let current_interaction_time = current_time - interaction_start;   
+    let current_interaction_time = current_time - interaction_start;
 
     let interction_percentage = Math.ceil(((current_interaction_time * 100) / interaction_time) + 4);
 
-    if(interction_percentage >= 0 && interction_percentage <= 100) {   
+    if (interction_percentage >= 0 && interction_percentage <= 100) {
       setProgressBarPor(interction_percentage)
-    } 
+    }
 
     if (round_current_time >= interaction_start && round_current_time < interaction_end) {
       startInteraction()
@@ -194,54 +197,61 @@ function App() {
     }
   }, [changes]);
 
-  useEffect(() => {    
+  useEffect(() => {
     initPlayer();
     playerIns.current.subscribeToStateChange(setChanges);
   }, []);
 
-  useEffect(() => {    
-    let player = playerIns.current; 
+  useEffect(() => {
+    let player = playerIns.current;
     loadDefaultNextVideo(currentVideo);
-    player.load();      
+    player.load();
     player.seek(currentVideo.startVideo);
-    player.play(); 
+    if (autoPlay) player.play();
+
   }, [currentVideo]);
 
-  useEffect(()=> {  
-    if(interection) {
+  useEffect(() => {
+    if (interection) {
       setNextVideo(interection);
       setDisableIntercation(true);
       setShowInteraction(false);
     }
-    
+
   }, [interection])
-
-
 
   return (
     <div className="player_box">
-       
-      <Player src={videoLink} ref={playerIns} playsInline className="player" fluid={false} width={width} height={height}>
-      <BigPlayButton position="center" hidden />
-      <div className="decisions">
-        {showInteraction && currentVideo.decisions && currentVideo.decisions.map((el) => 
-        <div className="decision" key={el.text} onClick={ () => {
-          setInterection(el.sequenceVideoId)
-          } }> 
-          {el.text}
-        </div>   
-      )}
-      </div>
 
-      {showInteraction && <div className="base_progress_bar">
-        <div className="progress_bar" style={progressBar}></div>
-      </div> }
+      <Player src={videoLink} ref={playerIns} playsInline className="player" fluid={false} width={width} height={height}>
+          
+       <BigPlayButton position="center"/> 
+         
+        <div className="decisions">
+          <div className="decisions_container">
+            {showInteraction &&
+              currentVideo.decisions && currentVideo.decisions.map((el) =>
+                <div className="decision" key={el.text} onClick={() => {
+                  setInterection(el.sequenceVideoId)
+                }}>
+                  {el.text}
+                </div>
+              )}
+          </div>
+          {showInteraction &&
+            <div className="base_progress_bar">
+              <div className="progress_bar" style={progressBar}></div>
+            </div>
+          }
+        </div>
+
+
       </Player>
 
-      
-     
 
-      
+
+
+
     </div>
   );
 }
