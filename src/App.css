@@ -1,18 +1,21 @@
+* {
+  font-family: 'Roboto', sans-serif;
+  text-decoration: none;
+  outline: none;
+}
+
 body {
   background-color: #282c34;
 }
 
 .player_box {
-  position: relative;
-  width: 80%;
+  position: relative; 
   margin: 0 auto;
-  padding-top: 50%;
-  transform: translateY(-50%);
+  height: 100%;
+  width: 100%;
 }
 
-.player {
-  height: 500px;
-}
+.player {}
 
 .decisions {
   display: flex;
@@ -20,13 +23,14 @@ body {
   justify-content: space-around;
   width: 75%;
   position: absolute;
-  bottom: 100px;
-  left: 50%; 
+  bottom: 20%;
+  left: 50%;
   transform: translateX(-50%);
   z-index: 2147483647;
 }
 
 .decision {
+  cursor: pointer;
   background-color: transparent; /* Green */
   border: 2px solid lightgray;
   color: lightgray;
@@ -35,7 +39,9 @@ body {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  cursor: pointer;
+  -webkit-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
+  -moz-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
+  box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
 }
 
 .decision:hover { 
@@ -48,3 +54,21 @@ body {
   background-color: lightgray;
 }
 
+.base_progress_bar {
+  border: 2px solid lightgray;
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 45%;
+  z-index: 2147483647;
+  -webkit-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
+  -moz-box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
+  box-shadow: 10px 10px 7px -10px rgba(0,0,0,0.23);
+}
+ 
+.progress_bar {
+  height: 15px;
+  background-color: lightgray;
+  transition: width 1s ease;
+}

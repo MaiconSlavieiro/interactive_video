@@ -2,6 +2,7 @@ import './App.css';
 import "./video-react.css";
 import { Player, BigPlayButton  } from 'video-react';
 import React, { useEffect, useState } from 'react';
+import { useWindowSize } from '@react-hook/window-size';
 
 function App() {   
 
@@ -11,9 +12,14 @@ function App() {
   const [nextVideo, setNextVideo] = useState("");
   const [currentVideo, setCurrentVideo] = useState("");
   const [showInteraction, setShowInteraction] = useState(false);
+  const [disableIntercation, setDisableIntercation] = useState(false);
   const [interection, setInterection] = useState("");
   const [changes, setChanges] = useState({});
+  const [progressBarPor, setProgressBarPor] = useState(0);
 
+  const [width, height] = useWindowSize()
+
+  let progressBar = {width: progressBarPor + "%"}
 
   let script = {
     start: {
@@ -69,11 +75,6 @@ function App() {
           imgUrl: '',
           sequenceVideoId: 'eye',
           default: true
-        },
-        {
-          text: '🌞',
-          imgUrl: '',
-          sequenceVideoId: 'light'
         },
         {
           text: '🌚',
@@ -142,16 +143,17 @@ function App() {
   }
 
   const startInteraction = () => {
-    console.log('startInteraction')
-    if(!showInteraction) {  
+    if(!showInteraction && !disableIntercation) {  
       setShowInteraction(true)
     }
   }
 
   const endInteraction = () => {
-    console.log('startInteraction')
-    if(!showInteraction) {  
+    if(showInteraction) {  
       setShowInteraction(false)
+    }
+    if(disableIntercation) {
+      setDisableIntercation(false)
     }
   }
 
@@ -162,25 +164,40 @@ function App() {
   }
 
   useEffect(() => {    
-    let state = changes;
-    if (Math.round(state.currentTime) >= currentVideo.interactionStart) {
+
+    let current_time = changes.currentTime;
+    let round_current_time = Math.round(changes.currentTime);
+    let interaction_start = currentVideo.interactionStart;
+    let interaction_end = currentVideo.interactionEnd;
+
+    let interaction_time = interaction_end - interaction_start;
+    let current_interaction_time = current_time - interaction_start;   
+
+    let interction_percentage = Math.ceil(((current_interaction_time * 100) / interaction_time) + 4);
+
+    if(interction_percentage >= 0 && interction_percentage <= 100) {   
+      setProgressBarPor(interction_percentage)
+    } 
+
+    if (round_current_time >= interaction_start && round_current_time < interaction_end) {
       startInteraction()
     }
 
-    if (Math.round(state.currentTime) >= currentVideo.interactionEnd) {
+    if (round_current_time >= interaction_end) {
       endInteraction()
+      setProgressBarPor(0)
     }
 
-    if (Math.round(state.currentTime) >= currentVideo.endVideo) {
+    if (round_current_time >= currentVideo.endVideo) {
       endVideo()
+      setProgressBarPor(0)
     }
   }, [changes]);
 
   useEffect(() => {    
     initPlayer();
-    playerIns.current.subscribeToStateChange(setChanges);    
+    playerIns.current.subscribeToStateChange(setChanges);
   }, []);
- 
 
   useEffect(() => {    
     let player = playerIns.current; 
@@ -191,26 +208,37 @@ function App() {
   }, [currentVideo]);
 
   useEffect(()=> {  
-    if(interection)
-    setNextVideo(interection);
+    if(interection) {
+      setNextVideo(interection);
+      setDisableIntercation(true);
+      setShowInteraction(false);
+    }
+    
   }, [interection])
+
+
 
   return (
     <div className="player_box">
        
-      <Player src={videoLink} ref={playerIns} playsInline >
+      <Player src={videoLink} ref={playerIns} playsInline className="player" fluid={false} width={width} height={height}>
       <BigPlayButton position="center" hidden />
-      </Player>
-
       <div className="decisions">
         {showInteraction && currentVideo.decisions && currentVideo.decisions.map((el) => 
-        <button className="decision" key={el.text} onClick={ () => {
+        <div className="decision" key={el.text} onClick={ () => {
           setInterection(el.sequenceVideoId)
           } }> 
           {el.text}
-        </button>   
+        </div>   
       )}
       </div>
+
+      {showInteraction && <div className="base_progress_bar">
+        <div className="progress_bar" style={progressBar}></div>
+      </div> }
+      </Player>
+
+      
      
 
       
