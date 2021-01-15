@@ -223,7 +223,7 @@ function App() {
   return (
     <div className="player_box">
 
-      <Player src={videoLink} ref={playerIns} playsInline className="player" fluid={false} width={width} height={height}>
+      <Player src={videoLink} ref={playerIns} className="player" fluid={false} width={width} height={height}>
           
        <BigPlayButton position="center"/> 
          
